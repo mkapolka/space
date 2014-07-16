@@ -1,4 +1,7 @@
 require_relative 'space.rb'
+require_relative 'memes.rb'
+require_relative 'people.rb'
+require_relative 'locations.rb'
 require_relative 'parser.rb'
 
 reddit = MediaBoard.new
@@ -8,8 +11,7 @@ community.location = reddit
 
 cat_meme = Meme.new "cats"
 media1 = Media.new("crazy_cat_video.mp4", [cat_meme])
-post1 = Post.new(media1)
-reddit.add_post(post1)
+reddit.post_media(media1, community)
 
 marek = Person.new "Marek"
 
