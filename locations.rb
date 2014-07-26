@@ -22,24 +22,37 @@ class MediaBoard < Location
         @media = []
     end
 
-    def add_post(media)
+    def _add_post(media)
         @media << media
     end
 
     def post_media(media, poster)
         post = Post.new(media, poster, self)
-        add_post(post)
+        _add_post(post)
+        
+        # reponses
+        for person in self.occupants
+            person.view_post(post)
+            if person.likes_media? post
+                post.comment(person, "I like this!")
+            elsif person.dislikes_media? post
+                post.comment(person, "This sucks!")
+            else
+                post.comment(person, "This is pretty meh.")
+            end
+        end
     end
 end
 
 class Post < Media
-    attr_accessor :site, :poster, :media
+    attr_accessor :site, :poster, :media, :comments
 
     def initialize(media, poster, site)
         super ""
         @media = media
         @poster = poster
         @site = site
+        @comments = []
     end
 
     def memes
@@ -47,6 +60,10 @@ class Post < Media
     end
 
     def name
-        return "#{@media.name}, posted by #{@poster.name}"
+        return "#{@media.name}, shared by #{@poster.name}"
+    end
+
+    def comment(who, comment)
+        @comments << "#{who.name}: #{comment}"
     end
 end
