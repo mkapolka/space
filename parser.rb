@@ -1,5 +1,5 @@
 class Parser
-    attr_accessor :player, :world
+    attr_accessor :player, :world, :finished
 
     def initialize(world, player)
         @player = player
@@ -7,8 +7,15 @@ class Parser
     end
 
     def start(location)
-        display_location(location)
         @player = player
+        @finished = false
+        _loop
+    end
+
+    def _loop
+        while not @finished
+            display_location(@player.location)
+        end
     end
 
     def print_media_info(media)
@@ -17,8 +24,8 @@ class Parser
     end
 
     def display_travel(world)
-        finished = false
-        while not finished
+        success = false
+        while not success
             puts "Where would you like to go?"
             for location in world.locations
                 puts "[#{world.locations.index(location)}] #{location.name}"
@@ -27,54 +34,49 @@ class Parser
             puts "[b]ack"
             choice = gets.chomp
             if choice == 'b'
-                finished = true
+                success = true
             elsif choice.to_i < world.locations.length
                 location = world.locations[choice.to_i]
                 puts "You hyper jump to #{location.name}"
                 puts ""
-                display_location(location)
+                @player.location = location
+                success = true
+            else
+                puts "Invalid choice."
             end
         end
     end
 
     def display_location(location)
-        finished = false
-        while not finished
-            puts "You are at #{location.name}."
-            puts "Shared media:"
-            for media in location.media
-                puts "\t#{media.name}"
-            end
+        puts "You are at #{location.name}."
+        # Things to do :
+        #   * Go somewhere else
+        #   * See what's posted here
+        #   * Post something here
+        #   * See who's here?
+        puts "What would you like to do?"
+        puts " [1] Go somewhere else"
+        puts " [2] View media"
+        puts " [3] Share something"
+        puts " [4] Examine members"
 
-            # Things to do :
-            #   * Go somewhere else
-            #   * See what's posted here
-            #   * Post something here
-            #   * See who's here?
-            puts "What would you like to do?"
-            puts " [1] Go somewhere else"
-            puts " [2] View media"
-            puts " [3] Share something"
-            puts " [4] Examine members"
+        action = gets.chomp
+        puts ""
 
-            action = gets.chomp
-            puts ""
-
-            if action == '1'
-                display_travel(@world)
-            elsif action == '2'
-                display_posts_at_location(location)
-            elsif action == '3'
-                display_post_prompt(location)
-            elsif action[0] == 'q'
-                finished = true
-            end
+        if action == '1'
+            display_travel(@world)
+        elsif action == '2'
+            display_posts_at_location(location)
+        elsif action == '3'
+            display_post_prompt(location)
+        elsif action[0] == 'q'
+            @finished = true
         end
     end
 
     def display_posts_at_location(location)
-        finished = false
-        while not finished
+        success = false
+        while not success
             actions = []
             puts "Shared media:"
             for post in location.media
@@ -93,18 +95,20 @@ class Parser
             puts "[b] Back to location"
             input = gets.chomp
             if input == 'b'
-                display_location(location)
+                success = true
             elsif input.to_i < actions.length
                 actions[input.to_i].call
-                finished = true
+                success = true
                 puts ""
+            else
+                puts "Invalid action."
             end
         end
     end
 
     def display_post_prompt(location)
-        finished = false
-        while not finished
+        success = false
+        while not success
             actions = []
             puts "Your media:"
             for media in @player.media
@@ -120,11 +124,13 @@ class Parser
             puts "[b] Back"
             input = gets.chomp
             if input == 'b'
-                finished = true
+                success = true
             elsif input.to_i < actions.length + 1
                 actions[input.to_i - 1].call
-                finished = true
+                success = true
                 puts ""
+            else
+                puts "Invalid option."
             end
         end
     end

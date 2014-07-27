@@ -33,13 +33,6 @@ class MediaBoard < Location
         # reponses
         for person in self.occupants
             person.view_post(post)
-            if person.likes_media? post
-                post.comment(person, "I like this!")
-            elsif person.dislikes_media? post
-                post.comment(person, "This sucks!")
-            else
-                post.comment(person, "This is pretty meh.")
-            end
         end
     end
 end
@@ -65,5 +58,8 @@ class Post < Media
 
     def comment(who, comment)
         @comments << "#{who.name}: #{comment}"
+        if poster.is_a? Player
+            puts "#{who.name} tells you, \"#{comment}\""
+        end
     end
 end

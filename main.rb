@@ -30,7 +30,7 @@ other_community.location = other_board
 community.aesthetics << cat_meme
 other_community.aesthetics << dog_meme
 
-player = Person.new "Marek"
+player = Player.new "Marek"
 
 cat_lady = Person.new "The crazy cat lady"
 cat_lady.location = cat_archives
@@ -54,5 +54,6 @@ world.locations << reddit
 world.locations << other_board
 world.locations << cat_archives
 
+player.location = reddit
 parser = Parser.new(world, player)
 parser.start(reddit)

@@ -1,5 +1,5 @@
 class Person
-    attr_accessor :name, :media, :location, :seen
+    attr_accessor :name, :media, :location, :seen, :members
     # Memes
     attr_accessor :aesthetics
 
@@ -8,12 +8,25 @@ class Person
         @aesthetics = []
         @media = []
         @seen = []
+        self.members = 1
     end
 
     def view_post(post)
-        # Find common memes
-        common_memes = @aesthetics & post.media.memes
-        post.likes += common_memes.length
+        if not @seen.include? post.media
+            common_memes = common_memes(post)
+            post.likes += common_memes.length * @members
+            @seen << post.media
+        end
+
+        # Comment on the post
+        if self.likes_media? post
+            post.comment(self, "I like this!")
+        elsif self.dislikes_media? post
+            post.comment(self, "This sucks!")
+        else
+            post.comment(self, "This is pretty meh.")
+        end
+        # TODO something about reposts?
     end
 
     def location=(where)
@@ -44,20 +57,9 @@ class Player < Person
 end
 
 class Community < Person
-    attr_accessor :members
-
     def initialize(name)
         super name
-        @members = 10
-    end
-
-    def view_post(post)
-        if not @seen.include? post.media
-            common_memes = common_memes(post)
-            post.likes += common_memes.length * @members
-            @seen << post.media
-        end
-        # TODO something about reposts?
+        self.members = 10
     end
 
     def location=(where)
