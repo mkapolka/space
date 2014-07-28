@@ -23,6 +23,19 @@ class Parser
         puts "\tMemes: #{media.memes.map(&:name).join(", ")}"
     end
 
+    def print_person_info(person)
+        aesthetic_string = "nothing"
+        if person.aesthetics.length > 0
+            aesthetic_string = person.aesthetics.map{|x| "[#{x.name}]"}.join(", ")
+        end
+
+        if person.members == 1
+            puts "#{person.name} likes #{aesthetic_string}"
+        else
+            puts "#{person.name} like #{aesthetic_string}"
+        end
+    end
+
     def display_travel(world)
         success = false
         while not success
@@ -40,6 +53,7 @@ class Parser
                 puts "You hyper jump to #{location.name}"
                 puts ""
                 @player.location = location
+                @world.tick
                 success = true
             else
                 puts "Invalid choice."
@@ -59,6 +73,7 @@ class Parser
         puts " [2] View media"
         puts " [3] Share something"
         puts " [4] Examine members"
+        puts " [5] Do nothing"
 
         action = gets.chomp
         puts ""
@@ -69,9 +84,22 @@ class Parser
             display_posts_at_location(location)
         elsif action == '3'
             display_post_prompt(location)
+        elsif action == '4'
+            display_people_at_location(location)
+        elsif action == '5'
+            @world.tick
         elsif action[0] == 'q'
             @finished = true
+        else
+            puts "Invalid action"
         end
+    end
+
+    def display_people_at_location(location)
+        for person in location.occupants
+            print_person_info(person) if not person == @player
+        end
+        puts ""
     end
 
     def display_posts_at_location(location)
@@ -87,6 +115,7 @@ class Parser
                 actions << Proc.new do 
                     @player.store_media(post.media)
                     puts "You take a copy of #{post.media.name}"
+                    @world.tick
                 end
                 puts ""
             end
@@ -117,6 +146,7 @@ class Parser
                 actions << Proc.new do
                     puts "You rez a copy of #{media.name} and share it in #{location.name}"
                     location.post_media(media, player)
+                    @world.tick
                 end
             end
 

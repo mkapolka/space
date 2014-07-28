@@ -1,14 +1,20 @@
 class Person
-    attr_accessor :name, :media, :location, :seen, :members
+    attr_accessor :name, :media, :location, :seen, :members, :world
+    attr_accessor :known_locations
     # Memes
     attr_accessor :aesthetics
 
-    def initialize(name)
+    def initialize(name, world)
         @name = name
         @aesthetics = []
         @media = []
         @seen = []
+        @known_locations = []
         self.members = 1
+    end
+    
+    def tick
+        self.location.post_media(self.media.sample, self) if self.media.length != 0
     end
 
     def view_post(post)
@@ -30,6 +36,7 @@ class Person
     end
 
     def location=(where)
+        @location.remove_person(self) if not @location.nil?
         where.add_person self
         @location = where
     end
@@ -53,17 +60,41 @@ end
 
 class Player < Person
     def view_post(post)
+        puts "#{post.poster.name} posted #{post.media.name}"
+    end
+
+    def tick
     end
 end
 
 class Community < Person
-    def initialize(name)
-        super name
+    attr_accessor :locations
+    def initialize(name, world)
+        super name, world
         self.members = 10
+        self.locations = []
     end
 
     def location=(where)
         where.add_person self
         @location = where
+    end
+
+    def add_location(location)
+        self._add_location(location)
+        location.add_person(self)
+    end
+
+    def remove_location(location)
+        self._remove_location(location)
+        location.remove_person(self)
+    end
+
+    def _add_location(location)
+        self.locations << location if not self.locaitons.include? location
+    end
+
+    def _remove_location(location)
+        self.locations.delete location
     end
 end
