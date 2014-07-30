@@ -25,14 +25,19 @@ class Parser
 
     def print_person_info(person)
         aesthetic_string = "nothing"
-        if person.aesthetics.length > 0
-            aesthetic_string = person.aesthetics.map{|x| "[#{x.name}]"}.join(", ")
+        if person.liked_memes.length > 0
+            aesthetic_string = person.liked_memes.map{|x| "[#{x.name}]"}.join(", ")
+        end
+
+        dislikes_string = "nothing"
+        if person.disliked_memes.length > 0
+            dislikes_string = person.disliked_memes.map{|x| "[#{x.name}]"}.join(", ")
         end
 
         if person.members == 1
-            puts "#{person.name} likes #{aesthetic_string}"
+            puts "#{person.name} likes #{aesthetic_string}, dislikes #{dislikes_string}"
         else
-            puts "#{person.name} like #{aesthetic_string}"
+            puts "#{person.name} like #{aesthetic_string}, dislike #{dislikes_string}"
         end
     end
 

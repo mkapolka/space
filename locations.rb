@@ -1,5 +1,6 @@
 require_relative 'memes.rb'
 require_relative 'media.rb'
+require_relative 'world.rb'
 
 class Location
     attr_accessor :name, :occupants
@@ -8,6 +9,7 @@ class Location
         @name = "No name"
         @occupants = []
         @memory = 3
+        World.instance.locations << self
     end
 
     def add_person(person)

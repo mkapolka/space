@@ -1,6 +1,10 @@
 class World
     attr_accessor :locations, :time
 
+    def self.instance
+        return @@instance ||= World.new
+    end
+
     def initialize
         @locations = []
         @time = 0

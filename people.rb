@@ -1,12 +1,13 @@
 class Person
-    attr_accessor :name, :media, :location, :seen, :members, :world
+    attr_accessor :name, :media, :location, :seen, :members, :world, :memory
     attr_accessor :known_locations
     # Memes
-    attr_accessor :aesthetics
+    attr_accessor :liked_memes, :disliked_memes
 
     def initialize(name, world)
         @name = name
-        @aesthetics = []
+        @liked_memes = []
+        @disliked_memes = []
         @media = []
         @seen = []
         @known_locations = []
@@ -19,20 +20,28 @@ class Person
 
     def view_post(post)
         if not @seen.include? post.media
-            common_memes = common_memes(post)
+            common_memes = post.memes & self.liked_memes
             post.likes += common_memes.length * @members
             @seen << post.media
+            
+            # Comment on the post
+            if self.likes_media? post
+                post.comment(self, "I like this!")
+            elsif self.dislikes_media? post
+                post.comment(self, "This sucks!")
+            else
+                post.comment(self, "This is pretty meh.")
+            end
+            # TODO something about reposts?
+        else
+            # Seen it!
+            response = [
+                "Seen it!",
+                "Ooooooold!"
+            ].sample
+            post.comment(self, response)
         end
 
-        # Comment on the post
-        if self.likes_media? post
-            post.comment(self, "I like this!")
-        elsif self.dislikes_media? post
-            post.comment(self, "This sucks!")
-        else
-            post.comment(self, "This is pretty meh.")
-        end
-        # TODO something about reposts?
     end
 
     def location=(where)
@@ -45,16 +54,16 @@ class Person
         @media << media if not @media.include? media
     end
 
-    def common_memes(media)
-        return @aesthetics & media.memes
-    end
-
     def dislikes_media?(media)
-        return common_memes(media).length < 0
+        likes = media.memes & self.liked_memes
+        dislikes = media.memes & self.disliked_memes
+        return dislikes.length > likes.length
     end
 
     def likes_media?(media)
-        common_memes(media).length > 0
+        likes = media.memes & self.liked_memes
+        dislikes = media.memes & self.disliked_memes
+        return likes.length > dislikes.length
     end
 end
 
@@ -89,9 +98,15 @@ class Community < Person
         self._remove_location(location)
         location.remove_person(self)
     end
+    
+    def tick
+        self.locations.each do |location|
+            location.post_media(self.media.sample, self) if not self.media.empty?
+        end
+    end
 
     def _add_location(location)
-        self.locations << location if not self.locaitons.include? location
+        self.locations << location if not self.locations.include? location
     end
 
     def _remove_location(location)
