@@ -15,7 +15,11 @@ class Person
     end
     
     def tick
-        self.location.post_media(self.media.sample, self) if self.media.length != 0
+        # self.location.post_media(self.media.sample, self) if self.media.length != 0
+    end
+
+    def share_media(media)
+        self.location.post_media(media, self)
     end
 
     def view_post(post)
@@ -27,6 +31,7 @@ class Person
             # Comment on the post
             if self.likes_media? post
                 post.comment(self, "I like this!")
+                self.share_media(post.media)
             elsif self.dislikes_media? post
                 post.comment(self, "This sucks!")
             else
@@ -65,6 +70,10 @@ class Person
         dislikes = media.memes & self.disliked_memes
         return likes.length > dislikes.length
     end
+
+    def to_meme
+        return @_meme ||= PersonMeme.new(self)
+    end
 end
 
 class Player < Person
@@ -98,10 +107,16 @@ class Community < Person
         self._remove_location(location)
         location.remove_person(self)
     end
+
+    def share_media(media)
+        for location in self.locations
+            location.post_media(media, self) if not location.media_posted? media
+        end
+    end
     
     def tick
         self.locations.each do |location|
-            location.post_media(self.media.sample, self) if not self.media.empty?
+            # location.post_media(self.media.sample, self) if not self.media.empty?
         end
     end
 

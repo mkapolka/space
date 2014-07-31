@@ -23,6 +23,10 @@ class Location
     def tick
         self.occupants.each &:tick
     end
+
+    def to_meme
+        return @_meme ||= LocationMeme.new(self)
+    end
 end
 
 class MediaBoard < Location
@@ -45,6 +49,11 @@ class MediaBoard < Location
         for person in self.occupants
             person.view_post(post)
         end
+    end
+
+    def media_posted?(media)
+        posted_media = self.media.map(&:media)
+        return posted_media.include? media
     end
 
     def tick
@@ -71,7 +80,7 @@ class Post < Media
     end
 
     def memes
-        return media.memes + [PersonMeme.new(poster), LocationMeme.new(site)]
+        return media.memes + [poster.to_meme, site.to_meme]
     end
 
     def name
