@@ -93,6 +93,9 @@ class Parser
             display_people_at_location(location)
         elsif action == '5'
             @world.tick
+        elsif action == 'irb'
+            require 'pry'
+            binding.pry
         elsif action[0] == 'q'
             @finished = true
         else

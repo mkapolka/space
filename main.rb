@@ -46,13 +46,17 @@ imgur_community.add_location reddit
 imgur_community.add_location imgur
 imgur_community.liked_memes.concat [cat_meme, sex_meme, dog_meme]
 
-# Redditors hate imgurianas
+# Redditors hate imgurians
 community.disliked_memes.concat [imgur_community.to_meme]
 
 secret_community = Community.new "Gold Redditors", world
-secret_community.add_location reddit
 secret_community.add_location secret_board
-secret_community.liked_memes.concat [cat_meme, science_meme]
+secret_community.liked_memes.concat [cat_meme, science_meme, community.to_meme]
+
+gold_attache = Person.new "The Reddit Gold Attache", world
+gold_attache.location = reddit
+gold_attache.liked_memes = secret_community.liked_memes
+gold_attache.liked_memes.concat [secret_community.to_meme]
 
 other_community = Community.new "OtherBoardians", world
 other_community.add_location other_board

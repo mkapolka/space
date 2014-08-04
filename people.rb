@@ -1,3 +1,5 @@
+require_relative 'memes.rb'
+
 class Person
     attr_accessor :name, :media, :location, :seen, :members, :world, :memory
     attr_accessor :known_locations
@@ -19,25 +21,80 @@ class Person
     end
 
     def share_media(media)
-        self.location.post_media(media, self)
+        self.location.post_media(media, self) if not self.location.media_posted? media
+        
+        liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
+        for meme in liked_people
+            meme.person.receive_media(media, self)
+        end
+    end
+
+    def receive_media(media, sharer)
+        # Receive media directly from another person
+        if not self.seen.include? media
+            @seen << media
+            if not dislikes_person?(sharer)
+                share_media(media)
+            end
+        end
+    end
+
+    def dislikes_person?(who)
+        return self.disliked_memes.include? who.to_meme
     end
 
     def view_post(post)
         if not @seen.include? post.media
-            common_memes = post.memes & self.liked_memes
-            post.likes += common_memes.length * @members
-            @seen << post.media
-            
-            # Comment on the post
-            if self.likes_media? post
-                post.comment(self, "I like this!")
-                self.share_media(post.media)
-            elsif self.dislikes_media? post
-                post.comment(self, "This sucks!")
+            if not self.dislikes_person?(post.poster)
+                common_memes = post.memes & self.liked_memes
+                post.likes += common_memes.length * @members
+                @seen << post.media
+                
+                # Comment on the post
+                if self.likes_media? post
+                    self.share_media(post.media)
+
+                    # Change tastes
+                    not_liked_media = post.memes - self.liked_memes
+                    if not not_liked_media.empty?
+                        new_meme = not_liked_media.sample
+
+                        if self.disliked_memes.include? new_meme
+                            self.disliked_memes.delete new_meme
+                            post.comment(self, "This is great! Maybe #{new_meme.name} aren't so bad after all!")
+                        else
+                            self.liked_memes << new_meme
+                            post.comment(self, "This is great! Now I like #{new_meme.name}")
+                        end
+                    else
+                        post.comment(self, "I like this!")
+                    end
+
+                elsif self.dislikes_media? post
+                    post.comment(self, "This sucks!")
+
+                    # Change tastes
+                    not_liked_media = self.disliked_memes - post.memes
+                    if not not_liked_media.empty?
+                        new_meme = not_liked_media.sample
+
+                        if self.liked_memes.include? new_meme
+                            self.liked_memes.delete new_meme
+                            post.comment(self, "This sucks. #{new_meme.name} used to be cool.")
+                        else
+                            self.disliked_memes << new_meme
+                            post.comment(self, "Fuck this. #{new_meme.name} sucks now.")
+                        end
+                    else
+                        post.comment(self, "This sucks!")
+                    end
+                else
+                    post.comment(self, "This is pretty meh.")
+                end
             else
-                post.comment(self, "This is pretty meh.")
+                # Dislikes poster
+                post.comment(self, "GTFO #{post.poster.name}!")
             end
-            # TODO something about reposts?
         else
             # Seen it!
             response = [
@@ -46,7 +103,6 @@ class Person
             ].sample
             post.comment(self, response)
         end
-
     end
 
     def location=(where)
@@ -111,6 +167,11 @@ class Community < Person
     def share_media(media)
         for location in self.locations
             location.post_media(media, self) if not location.media_posted? media
+        end
+
+        liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
+        for meme in liked_people
+            meme.person.receive_media(media, self)
         end
     end
     
