@@ -23,10 +23,10 @@ class Person
     def share_media(media)
         self.location.post_media(media, self) if not self.location.media_posted? media
         
-        liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
-        for meme in liked_people
-            meme.person.receive_media(media, self)
-        end
+        # liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
+        # for meme in liked_people
+            # meme.person.receive_media(media, self)
+        # end
     end
 
     def receive_media(media, sharer)
@@ -169,10 +169,10 @@ class Community < Person
             location.post_media(media, self) if not location.media_posted? media
         end
 
-        liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
-        for meme in liked_people
-            meme.person.receive_media(media, self)
-        end
+        # liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
+        # for meme in liked_people
+            # meme.person.receive_media(media, self)
+        # end
     end
     
     def tick
