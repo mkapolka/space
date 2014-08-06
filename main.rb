@@ -45,18 +45,16 @@ imgur_community = Community.new "Imgurians", world
 imgur_community.add_location reddit
 imgur_community.add_location imgur
 imgur_community.liked_memes.concat [cat_meme, sex_meme, dog_meme]
+imgur_community.disliked_memes.concat [gore_meme, science_meme]
 
-# Redditors hate imgurians
-community.disliked_memes.concat [imgur_community.to_meme]
 
 secret_community = Community.new "Gold Redditors", world
 secret_community.add_location secret_board
-secret_community.liked_memes.concat [cat_meme, science_meme, community.to_meme]
+secret_community.liked_memes.concat [cat_meme, science_meme]
 
 gold_attache = Person.new "The Reddit Gold Attache", world
 gold_attache.location = reddit
 gold_attache.liked_memes = secret_community.liked_memes
-gold_attache.liked_memes.concat [secret_community.to_meme]
 
 other_community = Community.new "OtherBoardians", world
 other_community.add_location other_board
@@ -66,7 +64,23 @@ other_community.liked_memes.concat [dog_meme, sex_meme]
 contentious_community = Community.new "Space Ghettos", world
 contentious_community.location = contentious_board
 contentious_community.liked_memes.concat [sex_meme, gore_meme]
+
+# Inter community relationships and rivalries
+# Redditors hate imgurians
+community.disliked_memes.concat [imgur_community.to_meme]
+imgur_community.liked_memes.concat [community.to_meme]
+imgur_community.disliked_memes.concat [secret_community.to_meme]
 contentious_community.disliked_memes.concat [reddit.to_meme, community.to_meme]
+gold_attache.liked_memes.concat [secret_community.to_meme]
+secret_community.liked_memes.concat [community.to_meme]
+
+# Make sure that communities like the locations that they're occupying
+for location in world.locations
+    for person in location.occupants
+        person.liked_memes << location.to_meme if not person.liked_memes.include? location.to_meme  
+    end
+end
+
 
 cat_lady = Person.new "The crazy cat lady", world
 cat_lady.location = cat_archives

@@ -118,13 +118,15 @@ class Person
     def dislikes_media?(media)
         likes = media.memes & self.liked_memes
         dislikes = media.memes & self.disliked_memes
-        return dislikes.length > likes.length
+        neutrals = media.memes - likes - dislikes
+        return dislikes.length > likes.length && dislikes.length > neutrals.length
     end
 
     def likes_media?(media)
         likes = media.memes & self.liked_memes
         dislikes = media.memes & self.disliked_memes
-        return likes.length > dislikes.length
+        neutrals = media.memes - likes - dislikes
+        return likes.length > dislikes.length && likes.length > neutrals.length
     end
 
     def to_meme
