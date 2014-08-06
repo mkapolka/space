@@ -9,7 +9,6 @@ class Location
         @name = "No name"
         @occupants = []
         @memory = 3
-        World.instance.locations << self
     end
 
     def add_person(person)
