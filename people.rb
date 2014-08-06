@@ -1,5 +1,6 @@
 class Person
     attr_accessor :name, :media, :location, :seen, :members
+    attr_accessor :is_creative
     # Memes
     attr_accessor :aesthetics
 
@@ -8,6 +9,7 @@ class Person
         @aesthetics = []
         @media = []
         @seen = []
+        self.is_creative = false
         self.members = 1
     end
 
@@ -27,6 +29,10 @@ class Person
             post.comment(self, "This is pretty meh.")
         end
         # TODO something about reposts?
+    end
+
+    def create_media
+        Media.new "#{self.name}'s amazing creation" [self.liked_memes.sample]
     end
 
     def location=(where)
