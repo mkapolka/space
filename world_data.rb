@@ -8,14 +8,35 @@ $world_data = {
         {
             :id => "redditors",
             :likes => ["cats", "science"],
-            :creative => true,
+            # :creative => true,
             :members => 100
+        },
+        {
+            :id => "otherboardians",
+            :likes => ["redditors", "cats"],
+            :members => 70
+        },
+        {
+            :id => "spaceghettos",
+            :likes => ["gore"],
+            :dislikes => ["redditors"],
+            :members => 20
         }
     ],
     :places => [
         {
             :id => "reddit",
-            :occupants => ["redditors"]
+            :occupants => ["redditors", "otherboardians"]
+        },
+        {
+            :id => "other_board",
+            :name => "OtherBoard",
+            :occupants => ["otherboardians"]
+        },
+        {
+            :id => "spaceghetto",
+            :name => "Space Ghetto",
+            :occupants => ["spaceghettos"]
         }
     ]
 }
@@ -36,7 +57,7 @@ def load_world(world_data)
         end
 
         p.name = person[:name] || person[:id].clone
-        p.name.capitalize!
+        p.name = p.name.capitalize
         p.is_creative = person[:creative]
         people[person[:id]] = p
     end
@@ -45,6 +66,7 @@ def load_world(world_data)
     for location in world_data[:places]
         l = MediaBoard.new
         l.name = location[:name] || location[:id].clone
+        l.name = l.name.capitalize
         l.occupants = location[:occupants].map{|x| people[x]}
         places[location[:id]] = l
         world.locations << l
