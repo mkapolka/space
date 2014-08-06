@@ -2,6 +2,7 @@ require_relative 'memes.rb'
 
 class Person
     attr_accessor :name, :media, :location, :seen, :members, :world, :memory
+    attr_accessor :is_creative
     attr_accessor :known_locations
     # Memes
     attr_accessor :liked_memes, :disliked_memes
@@ -12,12 +13,17 @@ class Person
         @disliked_memes = []
         @media = []
         @seen = []
+        self.is_creative = false
         @known_locations = []
         self.members = 1
     end
     
     def tick
         # self.location.post_media(self.media.sample, self) if self.media.length != 0
+        if self.is_creative
+            new_media = self.create_media
+            self.location.post_media(new_media, self)
+        end
     end
 
     def share_media(media)
@@ -105,6 +111,10 @@ class Person
         end
     end
 
+    def create_media
+        Media.new "#{self.name}'s amazing creation", [self.liked_memes.sample]
+    end
+
     def location=(where)
         @location.remove_person(self) if not @location.nil?
         where.add_person self
@@ -180,6 +190,11 @@ class Community < Person
     def tick
         self.locations.each do |location|
             # location.post_media(self.media.sample, self) if not self.media.empty?
+        end
+
+        if self.is_creative
+            new_media = self.create_media
+            self.location.post_media(new_media, self)
         end
     end
 

@@ -40,6 +40,7 @@ community = Community.new "Redditors", world
 community.location = reddit
 community.liked_memes.concat [cat_meme, sex_meme, science_meme]
 community.disliked_memes.concat [gore_meme]
+community.is_creative = true
 
 imgur_community = Community.new "Imgurians", world
 imgur_community.add_location reddit
