@@ -20,6 +20,10 @@ class Person
     
     def tick
         # self.location.post_media(self.media.sample, self) if self.media.length != 0
+        if self.is_creative
+            new_media = self.create_media
+            self.location.post_media(new_media, self)
+        end
     end
 
     def share_media(media)
@@ -108,7 +112,7 @@ class Person
     end
 
     def create_media
-        Media.new "#{self.name}'s amazing creation" [self.liked_memes.sample]
+        Media.new "#{self.name}'s amazing creation", [self.liked_memes.sample]
     end
 
     def location=(where)
@@ -184,6 +188,11 @@ class Community < Person
     def tick
         self.locations.each do |location|
             # location.post_media(self.media.sample, self) if not self.media.empty?
+        end
+
+        if self.is_creative
+            new_media = self.create_media
+            self.location.post_media(new_media, self)
         end
     end
 
