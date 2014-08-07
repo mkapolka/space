@@ -110,7 +110,6 @@ if false
     end
 end
 
-player = Player.new "Marek", world
-player.location = world.locations[0]
+player = world.player
 parser = Parser.new(world, player)
 parser.start(reddit)

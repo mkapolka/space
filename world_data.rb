@@ -13,20 +13,45 @@ $world_data = {
         },
         {
             :id => "otherboardians",
+            :name => "Otherboardians",
             :likes => ["redditors", "cats"],
             :members => 70
         },
         {
             :id => "spaceghettos",
-            :likes => ["gore"],
+            :name => "Space Ghettos",
+            :likes => ["gore", "sex"],
             :dislikes => ["redditors"],
             :members => 20
+        },
+        {
+            :id => "gold_redditors",
+            :name => "Gold Redditors",
+            :likes => ["cats", "science", "redditors", "gold_lounge"],
+            :members => 13
+        },
+        {
+            :id => "gold_attache",
+            :name => "The Gold Reddit Attache",
+            :likes => ["cats", "science", "redditors", "reddit", "gold_lounge", "gold_redditors"],
+            :members => 1,
+        },
+        {
+            :id => "cat_lady",
+            :name => "The Crazy Cat Lady",
+            :likes => ["cats", "cat_archive"],
+            :members => 1
         }
     ],
     :places => [
         {
             :id => "reddit",
-            :occupants => ["redditors", "otherboardians"]
+            :occupants => ["redditors", "otherboardians", "gold_attache"]
+        },
+        {
+            :id => "gold_lounge",
+            :name => "The Reddit Gold Lounge",
+            :occupants => ["gold_redditors"]
         },
         {
             :id => "other_board",
@@ -37,8 +62,17 @@ $world_data = {
             :id => "spaceghetto",
             :name => "Space Ghetto",
             :occupants => ["spaceghettos"]
+        },
+        {
+            :id => "cat_archive",
+            :name => "The Cat Video Archive",
+            :occupants => ["cat_lady"]
         }
-    ]
+    ],
+    :player => {
+        :location => "spaceghetto",
+        :known_locations => ["reddit", "spaceghetto", "other_board"]
+    }
 }
 
 def load_world(world_data)
@@ -49,11 +83,11 @@ def load_world(world_data)
 
     # Make the people
     for person in world_data[:people]
-        if person[:members] > 1
+        if person[:members] == 1
             p = Person.new((person[:name] || person[:id]), world)
         else
-            p = Community.new
-            p.members = person.members
+            p = Community.new((person[:name] || person[:id]), world)
+            p.members = person[:members]
         end
 
         p.name = person[:name] || person[:id].clone
@@ -96,6 +130,12 @@ def load_world(world_data)
         p.liked_memes = person[:likes].map {|x| memes[x]}
         p.disliked_memes = person[:dislikes].map {|x| memes[x]}
     end
+
+    # Make the player
+    player = Player.new "Player", world
+    player.known_locations = world_data[:player][:known_locations].map {|x| places[x]}
+    player.location = places[world_data[:player][:location]]
+    world.player = player
 
     return world
 end

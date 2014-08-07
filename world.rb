@@ -1,5 +1,5 @@
 class World
-    attr_accessor :locations, :time
+    attr_accessor :locations, :time, :player
 
     def self.instance
         return @@instance ||= World.new
