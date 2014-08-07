@@ -194,7 +194,7 @@ class Community < Person
 
         if self.is_creative
             new_media = self.create_media
-            self.location.post_media(new_media, self)
+            self.locations.each{|l| l.post_media(new_media, self)}
         end
     end
 

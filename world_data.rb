@@ -8,7 +8,7 @@ $world_data = {
         {
             :id => "redditors",
             :likes => ["cats", "science"],
-            # :creative => true,
+            :creative => true,
             :members => 100
         },
         {
@@ -101,7 +101,15 @@ def load_world(world_data)
         l = MediaBoard.new
         l.name = location[:name] || location[:id].clone
         l.name = l.name.capitalize
-        l.occupants = location[:occupants].map{|x| people[x]}
+        location[:occupants].each do |who|
+            person = people[who]
+            l.occupants << person
+            if person.members == 1
+                person.location = l
+            else
+                person.add_location l
+            end
+        end
         places[location[:id]] = l
         world.locations << l
     end
