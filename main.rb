@@ -84,7 +84,6 @@ if false
         end
     end
 
-
     cat_lady = Person.new "The crazy cat lady", world
     cat_lady.location = cat_archives
     cat_lady.liked_memes << cat_meme

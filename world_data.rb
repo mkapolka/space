@@ -137,6 +137,15 @@ def load_world(world_data)
         person[:dislikes] ||= []
         p.liked_memes = person[:likes].map {|x| memes[x]}
         p.disliked_memes = person[:dislikes].map {|x| memes[x]}
+
+        p.liked_memes << p.to_meme
+        # By default, add self meme and location meme
+        if p.instance_of? Person
+            p.liked_memes << p.location.to_meme
+        else
+            p.liked_memes.concat p.locations.map(&:to_meme)
+        end
+
     end
 
     # Make the player
