@@ -45,16 +45,17 @@ class Parser
         success = false
         while not success
             puts "Where would you like to go?"
-            for location in world.locations
-                puts "[#{world.locations.index(location)}] #{location.name}"
+            potential_locations = player.known_locations
+            for location in potential_locations
+                puts "[#{potential_locations.index(location) + 1}] #{location.name}"
             end
 
             puts "[b]ack"
             choice = gets.chomp
             if choice == 'b'
                 success = true
-            elsif choice.to_i < world.locations.length
-                location = world.locations[choice.to_i]
+            elsif choice.to_i < potential_locations.length
+                location = potential_locations[choice.to_i - 1]
                 puts "You hyper jump to #{location.name}"
                 puts ""
                 @player.location = location
