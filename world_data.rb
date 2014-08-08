@@ -8,12 +8,12 @@ $world_data = {
         {
             :id => "redditors",
             :likes => ["cats", "science"],
+            :dislikes => ["imgurians"],
             :creative => true,
             :members => 100
         },
         {
-            :id => "otherboardians",
-            :name => "Otherboardians",
+            :id => "imgurians",
             :likes => ["redditors", "cats"],
             :members => 70
         },
@@ -33,7 +33,7 @@ $world_data = {
         {
             :id => "gold_attache",
             :name => "The Gold Reddit Attache",
-            :likes => ["cats", "science", "redditors", "reddit", "gold_lounge", "gold_redditors"],
+            :likes => ["cats", "science", "redditors", "gold_lounge", "gold_redditors"],
             :members => 1,
         },
         {
@@ -46,7 +46,7 @@ $world_data = {
     :places => [
         {
             :id => "reddit",
-            :occupants => ["redditors", "otherboardians", "gold_attache"]
+            :occupants => ["redditors", "imgurians", "gold_attache"]
         },
         {
             :id => "gold_lounge",
@@ -54,9 +54,8 @@ $world_data = {
             :occupants => ["gold_redditors"]
         },
         {
-            :id => "other_board",
-            :name => "OtherBoard",
-            :occupants => ["otherboardians"]
+            :id => "imgur",
+            :occupants => ["imgurians"]
         },
         {
             :id => "spaceghetto",
@@ -71,7 +70,7 @@ $world_data = {
     ],
     :player => {
         :location => "spaceghetto",
-        :known_locations => ["reddit", "spaceghetto", "other_board"]
+        :known_locations => ["reddit", "spaceghetto", "imgur"]
     }
 }
 
@@ -119,9 +118,9 @@ def load_world(world_data)
         for meme in (person[:likes] || []) | (person[:dislikes] || [])
             if not memes.keys.include? meme
                 if people.keys.include? meme
-                    m = PersonMeme.new(people[meme])
+                    m = people[meme].to_meme
                 elsif places.keys.include? meme
-                    m = LocationMeme.new(places[meme])
+                    m = places[meme].to_meme
                 else
                     m = Meme.new meme
                 end
@@ -153,6 +152,10 @@ def load_world(world_data)
     player.known_locations = world_data[:player][:known_locations].map {|x| places[x]}
     player.location = places[world_data[:player][:location]]
     world.player = player
+
+    # debug information
+    world.dbg_people = people
+    world.dbg_places = places
 
     return world
 end
