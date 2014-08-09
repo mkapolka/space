@@ -10,4 +10,4 @@ world = load_world($world_data)
 
 player = world.player
 parser = Parser.new(world, player)
-parser.start(reddit)
+parser.start()

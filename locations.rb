@@ -79,7 +79,7 @@ class Post < Media
     end
 
     def memes
-        return media.memes + [poster.to_meme, site.to_meme]
+        return media.memes | [poster.to_meme, site.to_meme]
     end
 
     def name

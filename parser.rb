@@ -6,7 +6,7 @@ class Parser
         @world = world
     end
 
-    def start(location)
+    def start
         @player = player
         @finished = false
         _loop
@@ -54,7 +54,7 @@ class Parser
             choice = gets.chomp
             if choice == 'b'
                 success = true
-            elsif choice.to_i < potential_locations.length
+            elsif choice.to_i <= potential_locations.length
                 location = potential_locations[choice.to_i - 1]
                 puts "You hyper jump to #{location.name}"
                 puts ""

@@ -53,11 +53,10 @@ class Person
         if not @seen.include? post.media
             if not self.dislikes_person?(post.poster)
                 common_memes = post.memes & self.liked_memes
-                post.likes += common_memes.length * @members
-                @seen << post.media
                 
                 # Comment on the post
                 if self.likes_media? post
+                    post.likes += @members
                     self.share_media(post.media)
 
                     # Change tastes
@@ -101,6 +100,7 @@ class Person
                 # Dislikes poster
                 post.comment(self, "GTFO #{post.poster.name}!")
             end
+            @seen << post.media
         else
             # Seen it!
             response = [
@@ -112,7 +112,13 @@ class Person
     end
 
     def create_media
-        Media.new "#{self.name}'s amazing creation", [self.liked_memes.sample]
+        meme = self.liked_memes.sample
+        name = "#{meme.name}_" + [
+            "best", "neat", "woah", "fails", "cool", "epic", "lol", "rofl", "lmao", "omg", "!!!"
+        ].sample + "." + [
+            "mp9", "hjpg", "fab"
+        ].sample
+        Media.new name, [meme]
     end
 
     def location=(where)
@@ -147,6 +153,8 @@ end
 class Player < Person
     def view_post(post)
         puts "#{post.poster.name} posted #{post.media.name}"
+        post_locations = post.memes.select{|x| x.is_a? LocationMeme}.map &:location
+        self.known_locations |= post_locations
     end
 
     def tick

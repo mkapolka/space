@@ -27,7 +27,7 @@ $world_data = {
         {
             :id => "gold_redditors",
             :name => "Gold Redditors",
-            :likes => ["cats", "science", "redditors", "gold_lounge"],
+            :likes => ["cats", "science", "redditors", "gold"],
             :members => 13
         },
         {
@@ -35,6 +35,12 @@ $world_data = {
             :name => "The Gold Reddit Attache",
             :likes => ["cats", "science", "redditors", "gold_lounge", "gold_redditors"],
             :members => 1,
+        },
+        {
+            :id => "gold_artist",
+            :name => "The Gold Reddit Court Jester",
+            :likes => ["cats", "science", "gold"],
+            :creative => true
         },
         {
             :id => "cat_lady",
@@ -51,7 +57,7 @@ $world_data = {
         {
             :id => "gold_lounge",
             :name => "The Reddit Gold Lounge",
-            :occupants => ["gold_redditors"]
+            :occupants => ["gold_redditors", "gold_artist"]
         },
         {
             :id => "imgur",
@@ -82,7 +88,7 @@ def load_world(world_data)
 
     # Make the people
     for person in world_data[:people]
-        if person[:members] == 1
+        if (person[:members] || 1) == 1
             p = Person.new((person[:name] || person[:id]), world)
         else
             p = Community.new((person[:name] || person[:id]), world)
