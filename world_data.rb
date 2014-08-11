@@ -75,7 +75,7 @@ $world_data = {
         }
     ],
     :player => {
-        :location => "spaceghetto",
+        :location => "reddit",
         :known_locations => ["reddit", "spaceghetto", "imgur"]
     }
 }

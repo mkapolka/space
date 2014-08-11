@@ -25,6 +25,8 @@ class World
 
     def tick
         self.time += 1
+        people = @locations.reduce [] {|a,x| a.concat x.occupants}
+        people.each &:tick
         @locations.each &:tick
     end
 end

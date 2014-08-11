@@ -20,11 +20,17 @@ class Location
     end
 
     def tick
-        self.occupants.each &:tick
+
     end
 
     def to_meme
         return @_meme ||= LocationMeme.new(self)
+    end
+
+    def tell(message)
+        if not self.occupants.find{|x| x.is_a? Player}.nil?
+            puts message
+        end
     end
 end
 

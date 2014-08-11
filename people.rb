@@ -19,20 +19,28 @@ class Person
     end
     
     def tick
-        # self.location.post_media(self.media.sample, self) if self.media.length != 0
+        # Move to a different location
+        location_meme = self.liked_memes.select{|x| x.is_a? LocationMeme}.sample
+        new_location = location_meme.location if not location_meme.nil?
+        if not new_location.nil? and self.location != new_location
+            self.location.tell "#{self.name} leaves for #{new_location.name}"
+            new_location.tell "#{self.name} arrives from #{self.location.name}"
+            self.location = new_location
+        end
+
         if self.is_creative
             new_media = self.create_media
             self.location.post_media(new_media, self)
+        end
+
+        if self.media.length > 0
+            potential_posts = self.media.select{|x| not self.location.media_posted? x}
+            self.location.post_media(potential_posts.sample, self) if not potential_posts.empty?
         end
     end
 
     def share_media(media)
         self.location.post_media(media, self) if not self.location.media_posted? media
-        
-        # liked_people = self.liked_memes.select {|x| x.is_a? PersonMeme}
-        # for meme in liked_people
-            # meme.person.receive_media(media, self)
-        # end
     end
 
     def receive_media(media, sharer)
@@ -74,6 +82,8 @@ class Person
                     else
                         post.comment(self, "I like this!")
                     end
+
+                    self.media << post.media if not self.media.include? post.media
 
                 elsif self.dislikes_media? post
                     post.comment(self, "This sucks!")
