@@ -1,7 +1,8 @@
 require_relative 'memes.rb'
 
 class Person
-    attr_accessor :name, :media, :location, :seen, :members, :world, :memory
+    attr_accessor :name, :media, :location, :seen, :members, :world, :memory, :links
+    attr_accessor :player_karma
     attr_accessor :is_creative
     attr_accessor :known_locations
     # Memes
@@ -13,9 +14,12 @@ class Person
         @disliked_memes = []
         @media = []
         @seen = []
+        @links = []
         self.is_creative = false
         @known_locations = []
         self.members = 1
+
+        self.player_karma = 0
     end
     
     def tick
@@ -83,6 +87,11 @@ class Person
                         post.comment(self, "I like this!")
                     end
 
+                    # Add karma
+                    if post.poster.is_a? Player
+                        self.increase_reputation(post.poster)
+                    end
+
                     self.media << post.media if not self.media.include? post.media
 
                 elsif self.dislikes_media? post
@@ -118,6 +127,23 @@ class Person
                 "Ooooooold!"
             ].sample
             post.comment(self, response)
+        end
+    end
+
+    def increase_reputation(who)
+        if who.is_a? Player
+            self.player_karma += 1
+            new_location = self.links[self.player_karma - 1]
+            rep_name = ["Known", "Liked", "Trusted"][self.player_karma - 1]
+            puts ""
+            puts "==============="
+            puts "Your reputation with #{self.name} is now \"#{rep_name}.\""
+            if not new_location.nil? and not who.known_locations.include? new_location
+                puts "#{self.name} shares one of their secret links with you. You can now go to #{new_location.name}"
+                who.known_locations << new_location
+            end
+            puts "==============="
+            puts ""
         end
     end
 

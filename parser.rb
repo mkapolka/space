@@ -116,7 +116,7 @@ class Parser
         while not success
             actions = []
             puts "Shared media:"
-            for post in location.media
+            location.media.each do |post|
                 print_media_info(post)
                 puts "\tComments:"
                 puts post.comments.map{|x| "\t\t#{x}"}.join("\n")
@@ -149,12 +149,13 @@ class Parser
         while not success
             actions = []
             puts "Your media:"
-            for media in @player.media
+            @player.media.each do |media|
                 print_media_info(media)
                 puts "[#{actions.length + 1}] Share this?"
+                m = media
                 actions << Proc.new do
-                    puts "You rez a copy of #{media.name} and share it in #{location.name}"
-                    location.post_media(media, player)
+                    puts "You rez a copy of #{m.name} and share it in #{location.name}"
+                    location.post_media(m, player)
                     @world.tick
                 end
             end

@@ -10,18 +10,21 @@ $world_data = {
             :likes => ["cats", "science"],
             :dislikes => ["imgurians"],
             :creative => true,
-            :members => 100
+            :members => 100,
+            :links => ["reddit", "pantyselling", "gold_lounge"]
         },
         {
             :id => "imgurians",
             :likes => ["redditors", "cats"],
-            :members => 70
+            :members => 70,
+            :links => ["imgur"]
         },
         {
             :id => "spaceghettos",
             :name => "Space Ghettos",
             :likes => ["gore", "sex"],
             :dislikes => ["redditors"],
+            :links => ["space_ghetto", "erowid"]
             :members => 20
         },
         {
@@ -44,9 +47,23 @@ $world_data = {
         },
         {
             :id => "cat_lady",
+            :creative => true,
             :name => "The Crazy Cat Lady",
             :likes => ["cats", "cat_archive"],
             :members => 1
+        },
+        {
+            :id => "panty_sellers",
+            :name => "Panty Sellers",
+            :creative => true,
+            :likes => ["underwear", "sex", "capitalism"],
+            :members => 13
+        },
+        {
+            :id => "panty_buyers",
+            :name => "Panty Buyers",
+            :likes => ["underwear", "sex", "capitalism"],
+            :members => 35
         }
     ],
     :places => [
@@ -72,11 +89,34 @@ $world_data = {
             :id => "cat_archive",
             :name => "The Cat Video Archive",
             :occupants => ["cat_lady"]
+        },
+        {
+            :id => "pantyselling",
+            :name => "/r/pantyselling",
+            :occupants => ["panty_sellers", "panty_buyers"]
+        },
+        {
+            :id => "erowid",
+            :name => "Erowid",
+            :occupants => ["spaceghettos"]
+        }
+    ],
+    :media => [
+        {
+            :id => "reddit_pleaser",
+            :name => "red-nip",
+            :memes => ["science", "cats"]
+        },
+        {
+            :id => "reddit_pleaser_2",
+            :name => "red-nip-2.ewd",
+            :memes => ["science", "cats"]
         }
     ],
     :player => {
         :location => "reddit",
-        :known_locations => ["reddit", "spaceghetto", "imgur"]
+        :known_locations => ["reddit", "spaceghetto", "imgur", "cat_archive"],
+        :media => ["reddit_pleaser", "reddit_pleaser_2"]
     }
 }
 
@@ -85,6 +125,7 @@ def load_world(world_data)
     memes = {}
     people = {}
     places = {}
+    media = {}
 
     # Make the people
     for person in world_data[:people]
@@ -119,6 +160,12 @@ def load_world(world_data)
         world.locations << l
     end
 
+    # Build up people links
+    for person in world_data[:people]
+        p = people[person[:id]]
+        p.links = person[:links].map{|x| places[x]} if not person[:links].nil?
+    end
+
     # Build up the memes
     for person in world_data[:people]
         for meme in (person[:likes] || []) | (person[:dislikes] || [])
@@ -133,6 +180,12 @@ def load_world(world_data)
                 memes[meme] = m
             end
         end
+    end
+
+    # Make the freestanding media
+    for media_info in world_data[:media]
+        m = Media.new media_info[:name], media_info[:memes].map{|x| memes[x]}
+        media[media_info[:id]] = m
     end
 
     # Associate people memes
@@ -150,13 +203,13 @@ def load_world(world_data)
         else
             p.liked_memes.concat p.locations.map(&:to_meme)
         end
-
     end
 
     # Make the player
     player = Player.new "Player", world
     player.known_locations = world_data[:player][:known_locations].map {|x| places[x]}
     player.location = places[world_data[:player][:location]]
+    player.media = world_data[:player][:media].map{|x| media[x]}
     world.player = player
 
     # debug information
