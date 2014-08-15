@@ -62,7 +62,7 @@ class Person
     end
 
     def view_post(post)
-        if not @seen.include? post.media
+        if not @seen.include? post.media and not post.poster == self
             if not self.dislikes_person?(post.poster)
                 common_memes = post.memes & self.liked_memes
                 
@@ -73,6 +73,7 @@ class Person
 
                     # Change tastes
                     not_liked_media = post.memes - self.liked_memes
+                    not_liked_media.select! {|x| x.is_a? LocationMeme or x.is_a? PersonMeme}
                     if not not_liked_media.empty?
                         new_meme = not_liked_media.sample
 
@@ -99,6 +100,7 @@ class Person
 
                     # Change tastes
                     not_liked_media = self.disliked_memes - post.memes
+                    not_liked_media.select! {|x| x.is_a? LocationMeme or x.is_a? PersonMeme}
                     if not not_liked_media.empty?
                         new_meme = not_liked_media.sample
 
@@ -121,12 +123,14 @@ class Person
             end
             @seen << post.media
         else
-            # Seen it!
-            response = [
-                "Seen it!",
-                "Ooooooold!"
-            ].sample
-            post.comment(self, response)
+            if post.poster != self
+                # Seen it!
+                response = [
+                    "Seen it!",
+                    "Ooooooold!"
+                ].sample
+                post.comment(self, response)
+            end
         end
     end
 
@@ -210,6 +214,16 @@ class Community < Person
         @location = where
     end
 
+    def locations=(what)
+        what.each do |location|
+            if not location.occupants.include? self
+                location.tell "#{self.name} begin to trickle in."
+                location.add_person self 
+            end
+        end
+        @locations = what
+    end
+
     def add_location(location)
         self._add_location(location)
         location.add_person(self)
@@ -230,11 +244,19 @@ class Community < Person
             # meme.person.receive_media(media, self)
         # end
     end
+
+    def update_locations
+        liked_locations = self.liked_memes.select{|x| x.is_a? LocationMeme}.map &:location
+        no_longer_liked = self.locations - liked_locations
+        no_longer_liked.each do |location|
+            location.tell "#{self.name} leave in droves"
+        end
+        self.locations = liked_locations
+    end
     
     def tick
-        self.locations.each do |location|
-            # location.post_media(self.media.sample, self) if not self.media.empty?
-        end
+        # Move to all 
+        self.update_locations
 
         if self.is_creative
             new_media = self.create_media

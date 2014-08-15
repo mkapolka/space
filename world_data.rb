@@ -24,7 +24,7 @@ $world_data = {
             :name => "Space Ghettos",
             :likes => ["gore", "sex"],
             :dislikes => ["redditors"],
-            :links => ["space_ghetto", "erowid"]
+            :links => ["space_ghetto", "erowid"],
             :members => 20
         },
         {
